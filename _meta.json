@@ -1,6 +1,6 @@
 {
   "name": "ctrip-publish-mcp",
-  "version": "3.4.0",
+  "version": "1.0.1",
   "description": "携程笔记全自动发布 MCP Server - 支持 Cookie 持久化(vbkticket)、搜索图片、填写内容、上传图片、发布笔记",
   "author": "ansike",
   "homepage": "https://github.com/ansike/ctrip-publish-skill",
