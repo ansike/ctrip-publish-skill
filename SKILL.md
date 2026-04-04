@@ -1,90 +1,74 @@
 ---
 name: ctrip-publish-mcp
-version: 3.3.0
-description: 携程笔记全自动发布 MCP Server - 支持搜索图片、填写内容、上传图片、发布笔记
+version: 3.4.0
+description: 携程笔记全自动发布 MCP Server - 支持 Cookie 持久化(vbkticket)、搜索图片、填写内容、上传图片、发布笔记
 emoji: 🚄
 ---
 
 # 携程笔记发布 MCP Server
 
-这是一个基于 **Model Context Protocol (MCP)** 的携程笔记发布工具。
+基于 **Model Context Protocol (MCP)** 的携程笔记发布工具，支持登录态持久化。
 
-## 架构
+## 核心特性
 
-```
-OpenClaw <-> MCP Server (stdio) <-> 浏览器 CDP
-```
+### 🔐 Cookie 持久化
+- 自动保存 `vbkticket` 等登录态 cookie
+- 存储路径：`~/.config/ctrip-publish/cookies.json`
+- 一次登录，多次复用
 
-## 提供的 Tools
+### 🛠️ 提供的 Tools
 
-### 1. search_images
-搜索高清图片
-
-**参数:**
-- `keyword` (string): 搜索关键词，如 "故宫"、"长城"
-- `count` (integer): 搜索数量，默认 5
-
-**返回:** Bing Images 搜索 URL
-
-### 2. download_images
-下载图片到本地
-
-**参数:**
-- `urls` (array): 图片URL列表
-- `output_dir` (string): 输出目录，默认 `/tmp/openclaw/uploads`
-
-### 3. fill_form
-填写发布表单
-
-**参数:**
-- `title` (string): 标题（必须少于20字）
-- `content` (string): 正文内容
-- `destination` (string): 目的地，如 "北京"
-- `date` (string): 日期，如 "2026-04-04"
-
-**验证:**
-- 标题长度 < 20 字
-- 正文长度 ≥ 60 字（建议）
-
-### 4. upload_images
-上传图片到携程页面
-
-**参数:**
-- `image_paths` (array): 图片文件路径列表
-- `cdp_url` (string): CDP WebSocket URL
-
-### 5. publish
-点击发布按钮
-
-**参数:**
-- `cdp_url` (string): CDP WebSocket URL
+| Tool | 描述 |
+|------|------|
+| `search_images` | 从 Bing Images 搜索高清图片 |
+| `download_images` | 下载图片到本地 |
+| `fill_form` | 填写发布表单（带验证） |
+| `upload_images` | 上传图片到携程页面 |
+| `publish` | 点击发布按钮 |
+| `get_cookies` | 获取保存的 cookies |
+| `set_cookie` | 设置并保存 cookie |
+| `check_login` | 检查登录状态 |
+| `clear_cookies` | 清除所有 cookies |
 
 ## 使用流程
 
+### 1. 检查登录状态
 ```
-1. search_images(keyword="故宫") 
-   -> 获取 Bing Images URL
-   
-2. browser.navigate(url)
-   -> 打开图片搜索页面
-   
-3. download_images(urls=[...])
-   -> 下载图片到本地
-   
-4. fill_form(title="...", content="...")
-   -> 验证内容格式
-   
-5. browser.navigate(url="https://we.ctrip.com/publish/publishPictureText")
-   -> 打开发布页面
-   
-6. browser.act(kind="evaluate", fn="...")
-   -> 填写标题、正文
-   
-7. upload_images(image_paths=[...], cdp_url="...")
-   -> 上传图片
-   
-8. publish(cdp_url="...")
-   -> 点击发布
+check_login()
+-> 返回: is_logged_in, has_vbkticket
+```
+
+### 2. 如果未登录
+- 使用 browser 工具打开携程登录页
+- 用户扫码/密码登录
+- 使用 set_cookie 保存 vbkticket
+
+### 3. 发布笔记
+```
+1. search_images(keyword="故宫")
+2. download_images(urls=[...])
+3. fill_form(title="...", content="...")
+4. upload_images(image_paths=[...], cdp_url="...")
+5. publish(cdp_url="...")
+```
+
+## Cookie 管理
+
+### 获取 vbkticket
+```python
+get_cookies()
+# 返回: { "vbkticket": "xxx", "is_logged_in": true }
+```
+
+### 设置 vbkticket
+```python
+set_cookie(name="vbkticket", value="your_token", domain="we.ctrip.com")
+```
+
+### 检查登录
+```python
+check_login()
+# 返回: { "is_logged_in": true, "has_vbkticket": true }
 ```
 
 ## 配置
@@ -93,7 +77,7 @@ OpenClaw <-> MCP Server (stdio) <-> 浏览器 CDP
 ```json
 {
   "name": "ctrip-publish-mcp",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "runtime": "mcp",
   "mcp": {
     "type": "stdio",
@@ -103,10 +87,11 @@ OpenClaw <-> MCP Server (stdio) <-> 浏览器 CDP
 }
 ```
 
-## 依赖
+## 重要限制
 
-- Python 3.8+
-- websockets (用于 CDP 连接)
+- 标题字数：**必须少于20字**（不是≤20字）
+- 正文字数：建议 **≥60字** 以评为优质
+- 图片数量：**3-20张**
 
 ## GitHub
 
