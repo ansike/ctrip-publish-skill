@@ -1,0 +1,11 @@
+{
+  "name": "ctrip-publish",
+  "version": "1.0.0",
+  "description": "携程笔记发布技能",
+  "author": "QClaw",
+  "homepage": "",
+  "tags": ["携程", "发布", "笔记", "旅行"],
+  "keywords": ["ctrip", "publish", "travel", "notes"],
+  "enabled": true,
+  "runtime": "skill"
+}
