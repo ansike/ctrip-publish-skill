@@ -141,6 +141,12 @@ check_login()
 
 ## Cookie 管理
 
+### list_articles 获取笔记列表
+```python
+list_articles(quality_only=True, limit=50)
+# 返回: { "totalCount": 70, "articles": [...] }
+```
+
 ### 获取 vbkticket
 ```python
 get_cookies()

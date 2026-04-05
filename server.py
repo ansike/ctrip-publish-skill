@@ -107,6 +107,7 @@ class CtripMCPServer:
             "set_cookie": self.set_cookie,
             "check_login": self.check_login,
             "clear_cookies": self.clear_cookies,
+            "list_articles": self.list_articles,
         }
     
     def run(self):
@@ -473,6 +474,46 @@ return 'not found';
 """
         }
     
+    def list_articles(self, quality_only: bool = False, limit: int = 50) -> Dict:
+        """获取笔记列表
+        
+        参数:
+            quality_only: 是否只返回优质笔记（level=2）
+            limit: 返回数量限制
+        """
+        return {
+            "status": "success",
+            "message": "调用 list_articles 需要通过 exec + curl 访问 API",
+            "api_url": "https://m.ctrip.com/restapi/soa2/14045/json/searchMyArticleListForApp",
+            "method": "POST",
+            "required_headers": {
+                "Content-Type": "application/json",
+                "Cookie": "vbkticket=xxx; GUID=xxx"
+            },
+            "request_body": {
+                "clientAuth": "",
+                "districtId": 0,
+                "imageCutType": 1,
+                "pagePara": {"pageIndex": 1, "pageSize": limit, "sortType": 30},
+                "productTypes": [5],
+                "showType": 2,
+                "articleStatus": 0,
+                "keyWord": "",
+                "head": {"cid": "xxx", "cver": "1.0", "lang": "01", "sid": "8888", "syscode": "09"}
+            },
+            "response_fields": {
+                "totalCount": "总笔记数",
+                "resultList[].articleId": "笔记ID",
+                "resultList[].articleTitle": "笔记标题",
+                "resultList[].level": "优质等级（2=优质）",
+                "resultList[].createTime": "创建时间",
+                "resultList[].publishTime": "发布时间"
+            },
+            "curl_example": """curl 'https://m.ctrip.com/restapi/soa2/14045/json/searchMyArticleListForApp' \
+  -H 'content-type: application/json' \
+  -b 'vbkticket=XXX; GUID=XXX' \
+  --data-raw '{"clientAuth":"","districtId":0,"imageCutType":1,"pagePara":{"pageIndex":1,"pageSize":50,"sortType":30},"productTypes":[5],"showType":2,"articleStatus":0,"keyWord":"","head":{"cid":"XXX","cver":"1.0","lang":"01","sid":"8888","syscode":"09"}}'"""
+        }    
     # ========== Cookie 管理工具 ==========
     
     def get_cookies(self) -> Dict:
@@ -847,6 +888,46 @@ return 'not found';
 """
         }
     
+    def list_articles(self, quality_only: bool = False, limit: int = 50) -> Dict:
+        """获取笔记列表
+        
+        参数:
+            quality_only: 是否只返回优质笔记（level=2）
+            limit: 返回数量限制
+        """
+        return {
+            "status": "success",
+            "message": "调用 list_articles 需要通过 exec + curl 访问 API",
+            "api_url": "https://m.ctrip.com/restapi/soa2/14045/json/searchMyArticleListForApp",
+            "method": "POST",
+            "required_headers": {
+                "Content-Type": "application/json",
+                "Cookie": "vbkticket=xxx; GUID=xxx"
+            },
+            "request_body": {
+                "clientAuth": "",
+                "districtId": 0,
+                "imageCutType": 1,
+                "pagePara": {"pageIndex": 1, "pageSize": limit, "sortType": 30},
+                "productTypes": [5],
+                "showType": 2,
+                "articleStatus": 0,
+                "keyWord": "",
+                "head": {"cid": "xxx", "cver": "1.0", "lang": "01", "sid": "8888", "syscode": "09"}
+            },
+            "response_fields": {
+                "totalCount": "总笔记数",
+                "resultList[].articleId": "笔记ID",
+                "resultList[].articleTitle": "笔记标题",
+                "resultList[].level": "优质等级（2=优质）",
+                "resultList[].createTime": "创建时间",
+                "resultList[].publishTime": "发布时间"
+            },
+            "curl_example": """curl 'https://m.ctrip.com/restapi/soa2/14045/json/searchMyArticleListForApp' \
+  -H 'content-type: application/json' \
+  -b 'vbkticket=XXX; GUID=XXX' \
+  --data-raw '{"clientAuth":"","districtId":0,"imageCutType":1,"pagePara":{"pageIndex":1,"pageSize":50,"sortType":30},"productTypes":[5],"showType":2,"articleStatus":0,"keyWord":"","head":{"cid":"XXX","cver":"1.0","lang":"01","sid":"8888","syscode":"09"}}'"""
+        }    
     def send_error(self, request_id, code: int, message: str):
         """发送错误响应"""
         print(json.dumps({
